@@ -10,7 +10,7 @@ class Util extends null {
             if (!existsSync(path)) throw new Error("[GET FILES] - пути не существует", path);
             const files = readdirSync(path).filter((f) => f.endsWith(".js"));
             if (!Array.isArray(only)) return files.map((f) => resolve(path, f));
-            return files.filter((f) => only.includes(f)).map((f) => resolve(path, f));
+            return files.filter((f) => only.includes(f.split(".js")[0])).map((f) => resolve(path, f));
         } catch (error) {
             Logger.error(error);
         }
@@ -22,7 +22,7 @@ class Util extends null {
             if (!existsSync(path)) throw new Error("[GET FILENAMES] - пути не существует", path);
             const files = readdirSync(path).filter((f) => f.endsWith(".js"));
             if (!Array.isArray(only)) return files.map((f) => f.split(".js")[0]);
-            return files.filter((f) => only.includes(f)).map((f) => f.split(".js")[0]);
+            return files.filter((f) => only.includes(f.split(".js")[0])).map((f) => f.split(".js")[0]);
         } catch (error) {
             Logger.error(error);
         }
@@ -31,10 +31,10 @@ class Util extends null {
     static defaultRequire(files) {
         try {
             if (!Array.isArray(files)) throw new Error("[DEFAULT REQUIRE] - параметр fiels, должен быть типом Array", files);
-            return files.map((f) => {
+            return files.map((f, i) => {
                 if (!existsSync(f)) throw new Error("[DEFAULT REQUIRE] - пути не существует", f);
-                const f = require(f);
-                return new f();
+                const file = require(f);
+                return new file();
             });
         } catch (error) {
             Logger.error(error);
