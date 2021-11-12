@@ -2,9 +2,9 @@ const { ClientLoader } = require("../loaders/ClientLoader");
 const { ConfigLoader } = require("../loaders/ConfigLoader");
 const { ListenerLoader } = require("../loaders/ListenerLoader");
 
-const Events = require("./Events");
+const { Events } = require("./Events");
 
-class App extends null {
+class App {
     config;
     client;
     events = new Events();
@@ -24,7 +24,7 @@ class App extends null {
     }
 
     #initListeners() {
-        ListenerLoader.run();
+        ListenerLoader.run(this.config);
     }
 }
 

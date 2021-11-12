@@ -1,7 +1,9 @@
 const { Util } = require("../utils/Util");
 const { Logger } = require("../utils/Logger");
 
-class BaseListener extends null {
+const { App } = require("../core/App");
+
+class BaseListener {
     get name() {
         return this.constructor.name[0].toLowerCase() + this.constructor.name.slice(1);
     }
@@ -15,11 +17,34 @@ class BaseListener extends null {
     }
 
     run() {
+        this.logs();
+        this.execute();
+    }
+
+    logs() {
         const path = "App/Jobs" + "/" + this.constructor.name;
         const files = this.all ? Util.getFiles(path) : Util.getFiles(path, this.actions);
-        files.forEach((f) => {
-            Logger.info({ listener: this.constructor.name, job: this.name });
-            f.run();
+        const requiredFiles = Util.defaultRequire(files);
+        console.log(this.constructor.name);
+        if (requiredFiles && requiredFiles.length === 0) console.log();
+        if (!requiredFiles) return;
+        requiredFiles.forEach((f, i) => {
+            console.log("[SUCCESS]  " + f.constructor.name);
+            if (requiredFiles.length - 1 === i) return console.log();
+        });
+    }
+
+    execute() {
+        App.client[this.type](this.event, (...args) => this.start(...args));
+        App.client.login(App.config.discord.token);
+    }
+
+    start(...args) {
+        const path = "App/Jobs" + "/" + this.constructor.name;
+        const files = this.all ? Util.getFiles(path) : Util.getFiles(path, this.actions);
+        const requiredFiles = Util.defaultRequire(files);
+        requiredFiles.forEach((f) => {
+            f.run(...args);
         });
     }
 }

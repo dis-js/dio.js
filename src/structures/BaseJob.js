@@ -1,6 +1,10 @@
 const { Logger } = require("../utils/Logger");
 
-class BaseJob extends null {
+class BaseJob {
+    get name() {
+        return this.constructor.name[0].toLowerCase() + this.constructor.name.slice(1);
+    }
+
     handle() {
         Logger.info("[BASE JOB] - Handle");
     }
