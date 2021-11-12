@@ -1,9 +1,9 @@
 const { Util } = require("../utils/Util");
-const { Logger } = require("../utils/Logger");
-
 const { App } = require("../core/App");
 
 class BaseListener {
+    error = false;
+
     get name() {
         return this.constructor.name[0].toLowerCase() + this.constructor.name.slice(1);
     }
@@ -16,22 +16,26 @@ class BaseListener {
         return this.name;
     }
 
-    run() {
-        this.logs();
-        this.execute();
-    }
-
     logs() {
         const path = "App/Jobs" + "/" + this.constructor.name;
         const files = this.all ? Util.getFiles(path) : Util.getFiles(path, this.actions);
-        const requiredFiles = Util.defaultRequire(files);
         console.log(this.constructor.name);
-        if (requiredFiles && requiredFiles.length === 0) console.log();
-        if (!requiredFiles) return;
-        requiredFiles.forEach((f, i) => {
-            console.log("[SUCCESS]  " + f.constructor.name);
-            if (requiredFiles.length - 1 === i) return console.log();
+        files.forEach((file) => {
+            try {
+                const f = require(file);
+                new f();
+                console.log("[SUCCESS] - " + file.split("\\")[file.split("\\").length - 1].split(".js")[0]);
+            } catch (error) {
+                this.error = true;
+                console.log("[ERROR] - " + file.split("\\")[file.split("\\").length - 1].split(".js")[0]);
+            }
         });
+        console.log();
+        return this.error;
+    }
+
+    run() {
+        this.execute();
     }
 
     execute() {

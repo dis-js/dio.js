@@ -31,7 +31,7 @@ class Util extends null {
     static defaultRequire(files) {
         try {
             if (!Array.isArray(files)) throw new Error("[DEFAULT REQUIRE] - параметр fiels, должен быть типом Array", files);
-            return files.map((f) => {
+            return files.map((f, i) => {
                 if (!existsSync(f)) throw new Error("[DEFAULT REQUIRE] - пути не существует", f);
                 const file = require(f);
                 return new file();
